@@ -7,8 +7,13 @@ verify_ssl = true
 
 [packages]
 pytest = "*"
-sphin = "*"
 sphinx = "*"
+numpy = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+start = 'python .'
+test = 'pytest -sv'
