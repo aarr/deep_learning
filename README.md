@@ -11,9 +11,4 @@ pipenv run test
 ~~~
 
 ---
-## 内容
-- パーセプトロン[Chapter02]
-aaaa  
-bbb
 
-###

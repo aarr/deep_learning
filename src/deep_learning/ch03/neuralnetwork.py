@@ -130,23 +130,27 @@ def show_image():
     show_image(image_reshape)
 
 
-def analyze_image():
-    """画像解析"""
+class AnalyzeImage():
+    """画像解析：順方向の伝播"""
 
-    def get_testdata():
+    def __init__(self):
+        super().__init__()
+
+
+    def get_testdata(self):
         """テストデータ取得"""
         (img_train, label_train), (img_test, label_test) = load_image()
         return (img_test, label_test)
 
 
-    def init_network():
+    def init_network(self):
         """学習済み重みパラメータ取得"""
         with open(os.path.join(os.path.dirname(__file__), 'sample_weight.pkl'), 'rb') as f:
             network = pickle.load(f)
         return network
 
-    def predict(network, x):
-        """伝播"""
+    def forward(self, network, x):
+        """順伝播"""
         W1, W2, W3 = network['W1'], network['W2'], network['W3']
         b1, b2, b3 = network['b1'], network['b2'], network['b3']
 
@@ -161,17 +165,43 @@ def analyze_image():
         
         return y
 
-    # テストデータ、重み取得
-    data, label = get_testdata()
-    network = init_network()
-    # 解析
-    accuracy_cnt = 0
-    for i in range(len(data)):
-        y = predict(network, data[i])
-        p = np.argmax(y)
+    def analyze_image(self):
+        """画像解析メイン"""
+        # テストデータ、重み取得
+        data, label = self.get_testdata()
+        network = self.init_network()
+        # 解析
+        accuracy_cnt = 0
+        for i in range(len(data)):
+            y = self.forward(network, data[i])
+            p = np.argmax(y)
 
-        if p == label[i]:
-            accuracy_cnt += 1
-    # 正解率出力
-    log('Accuracy : {0}'.format(str(float(accuracy_cnt) / len(data))))
+            if p == label[i]:
+                accuracy_cnt += 1
+        # 正解率出力
+        accuracy = float(accuracy_cnt) / len(data)
+        log('Accuracy : {0}'.format(str(accuracy)))
+        return accuracy
+
+
+    def analyze_image_batch(self):
+        """画像解析メイン（バッチ）"""
+        data, label = self.get_testdata()
+        network = self.init_network()
+
+        batch_size = 100
+        accuracy_cnt = 0
+
+        # 0, 100, 200, 300...という配列を用意して、100兼単位で処理する
+        for i in range(0, len(data), batch_size):
+            data_batch = data[i:i+batch_size]
+            label_batch = self.forward(network, data_batch)
+            p = np.argmax(label_batch, axis=1)
+            accuracy_cnt += np.sum(p == label[i:i+batch_size])
+        
+         # 正解率出力
+        accuracy = float(accuracy_cnt) / len(data)
+        log('Accuracy : {0}'.format(str(accuracy)))
+        return accuracy
+       
 
