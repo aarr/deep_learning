@@ -9,4 +9,4 @@ def log(message):
     """
     current_frame = inspect.currentframe()
     call_frame = inspect.getouterframes(current_frame, 2)
-    print('[{0}] {1}'.format(call_frame[1][3], message))
+    print('[{0}] \r\n{1}\r\n'.format(call_frame[1][3], message))
